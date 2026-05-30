@@ -31,6 +31,50 @@
         </div>
 
         <form class="control-panel publish-form" id="publishForm">
+          <div class="ai-target-box">
+            <label>
+              关键词 AI 搜索发布网址
+              <input
+                id="publishKeyword"
+                type="text"
+                placeholder="例如：EN388 certified cut resistant gloves"
+              />
+            </label>
+            <div class="action-row">
+              <button class="button secondary" type="button" id="suggestPublishTargets">
+                AI 搜索发布网址
+              </button>
+              <span class="status-pill" id="suggestStatus">待搜索</span>
+            </div>
+          </div>
+
+          <section class="suggestion-panel" aria-labelledby="suggestion-title">
+            <div class="result-toolbar">
+              <div>
+                <span class="eyebrow">AI Suggestions</span>
+                <h3 id="suggestion-title">推荐发布网址</h3>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="monitor-table">
+                <thead>
+                  <tr>
+                    <th>平台</th>
+                    <th>网址</th>
+                    <th>适合原因</th>
+                    <th>发布方式</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="suggestionRows">
+                  <tr>
+                    <td colspan="5">输入关键词后点击“AI 搜索发布网址”。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
           <label>
             发布目标网址
             <input

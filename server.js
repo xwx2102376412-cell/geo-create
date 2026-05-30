@@ -120,6 +120,38 @@ Input:
 `.trim();
 }
 
+function buildPublishTargetPrompt(values) {
+  return `
+You are a B2B GEO distribution strategist.
+
+Suggest suitable publishing destinations for an industrial GEO article.
+Return valid JSON only using this exact shape:
+{
+  "targets": [
+    {
+      "platform": "Platform or website name",
+      "url": "https://example.com/path/",
+      "reason": "Why this is suitable for this keyword",
+      "method": "CMS login, guest post submission, company blog, industry directory, or marketplace profile"
+    }
+  ]
+}
+
+Rules:
+- Return 8-12 targets.
+- Prefer practical destinations a B2B industrial company might actually use:
+  company blog/CMS, WordPress admin pattern, Shopify blog admin, Webflow CMS, LinkedIn article, Medium, industry directory, trade marketplace profile, distributor portal, or relevant guest-post opportunity type.
+- If you are not certain about a real submission URL, recommend the safest public homepage or submission/contact page pattern and explain that it needs manual verification.
+- Do not invent credentials or claim guaranteed publication.
+- Keep reasons concise.
+
+Input:
+- Keyword: ${values.keyword}
+- Current target URL, if any: ${values.currentUrl || "None"}
+- Platform preference: ${values.platform || "Any"}
+`.trim();
+}
+
 function extractJson(content) {
   const trimmed = content.trim();
   if (trimmed.startsWith("{")) {
@@ -134,17 +166,24 @@ function extractJson(content) {
   return JSON.parse(match[0]);
 }
 
-async function generateArticle(values) {
+function getDeepSeekConfig(values = {}) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
   const allowedModels = new Set(["deepseek-chat", "deepseek-reasoner"]);
   const requestedModel = values.model || process.env.DEEPSEEK_MODEL || "deepseek-chat";
   const deepseekModel = allowedModels.has(requestedModel) ? requestedModel : "deepseek-chat";
+
   if (!apiKey) {
     const error = new Error("Missing DEEPSEEK_API_KEY.");
     error.statusCode = 500;
     throw error;
   }
+
+  return { apiKey, deepseekBaseUrl, deepseekModel };
+}
+
+async function generateArticle(values) {
+  const { apiKey, deepseekBaseUrl, deepseekModel } = getDeepSeekConfig(values);
 
   const apiResponse = await fetch(`${deepseekBaseUrl}/chat/completions`, {
     method: "POST",
@@ -188,6 +227,52 @@ async function generateArticle(values) {
   return extractJson(content);
 }
 
+async function suggestPublishTargets(values) {
+  const { apiKey, deepseekBaseUrl, deepseekModel } = getDeepSeekConfig(values);
+
+  const apiResponse = await fetch(`${deepseekBaseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: deepseekModel,
+      messages: [
+        {
+          role: "system",
+          content: "You suggest B2B content publishing destinations as valid JSON only.",
+        },
+        {
+          role: "user",
+          content: buildPublishTargetPrompt(values),
+        },
+      ],
+      temperature: 0.4,
+      max_tokens: 2500,
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  const responseText = await apiResponse.text();
+  if (!apiResponse.ok) {
+    const error = new Error(`DeepSeek API error: ${apiResponse.status} ${responseText}`);
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const data = JSON.parse(responseText);
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    const error = new Error("DeepSeek API returned an empty response.");
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const parsed = extractJson(content);
+  return Array.isArray(parsed.targets) ? parsed.targets : [];
+}
+
 loadLocalEnv();
 
 http
@@ -200,6 +285,19 @@ http
       } catch (error) {
         sendJson(response, error.statusCode || 500, {
           error: error.message || "Failed to generate article.",
+        });
+      }
+      return;
+    }
+
+    if (request.method === "POST" && request.url === "/api/suggest-publish-targets") {
+      try {
+        const values = await readJsonBody(request);
+        const targets = await suggestPublishTargets(values);
+        sendJson(response, 200, { targets });
+      } catch (error) {
+        sendJson(response, error.statusCode || 500, {
+          error: error.message || "Failed to suggest publish targets.",
         });
       }
       return;

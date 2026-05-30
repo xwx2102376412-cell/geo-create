@@ -670,6 +670,20 @@ textarea {
   margin-bottom: 18px;
 }
 
+.ai-target-box {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  border-radius: 8px;
+  background: #f3faf8;
+}
+
+.suggestion-panel {
+  display: grid;
+  gap: 12px;
+}
+
 .monitor-table-card {
   padding: 22px;
 }
