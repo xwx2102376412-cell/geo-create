@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文章生成 - GEO Content Studio</title>
+    <meta name="description" content="输入关键词生成标准 GEO 文章草稿。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="./index.html" aria-label="GEO Content Studio">
+        <span class="brand-mark">G</span>
+        <span>GEO Content Studio</span>
+      </a>
+      <nav class="top-nav" aria-label="页面导航">
+        <a href="./generator.html" aria-current="page">文章生成</a>
+        <a href="./article.html">文章页面</a>
+        <a href="./review.html">人工审核</a>
+        <a href="./monitor.html">AI 搜索监测</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="workspace generator-page reveal" aria-labelledby="generator-title">
+        <div class="section-heading">
+          <span class="eyebrow">Content Generator</span>
+          <h1 id="generator-title">GEO 文章生成</h1>
+          <p>输入关键词和业务信息，生成标准 GEO 文章格式：标题、简介、产品是什么、核心卖点、应用场景、选购建议、认证标准、公司优势、FAQ 和询盘按钮。</p>
+        </div>
+
+        <form class="control-panel" id="generatorForm">
+          <label>
+            输入关键词
+            <input
+              id="keyword"
+              type="text"
+              value="cut resistant gloves supplier in USA"
+              placeholder="例如：UHMWPE fiber supplier"
+            />
+          </label>
+
+          <div class="form-grid">
+            <label>
+              文章类型
+              <select id="articleType">
+                <option value="product">产品介绍型文章</option>
+                <option value="application">行业应用型文章</option>
+                <option value="buyer">买家问题型文章</option>
+                <option value="geo" selected>地区 GEO 页面</option>
+              </select>
+            </label>
+            <label>
+              产品分类
+              <select id="category"></select>
+            </label>
+            <label>
+              目标市场
+              <select id="market">
+                <option>USA</option>
+                <option>Europe</option>
+                <option>Middle East</option>
+                <option>Japan</option>
+                <option>China</option>
+              </select>
+            </label>
+            <label>
+              输出语言
+              <select id="language">
+                <option value="en" selected>English</option>
+                <option value="zh">中文</option>
+              </select>
+            </label>
+            <label>
+              DeepSeek 模型
+              <select id="deepseekModel">
+                <option value="deepseek-chat" selected>deepseek-chat</option>
+                <option value="deepseek-reasoner">deepseek-reasoner</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            公司名称
+            <input id="companyName" type="text" value="Your Company" />
+          </label>
+
+          <label>
+            额外要求
+            <textarea
+              id="notes"
+              rows="3"
+              placeholder="例如：不要写具体测试数据；强调 OEM 和样品申请；文章用于 WordPress 草稿。"
+            ></textarea>
+          </label>
+
+          <div class="action-row">
+            <button class="button primary" type="submit">生成文章草稿</button>
+            <a class="button secondary" href="./article.html">查看文章页面</a>
+            <span class="status-pill" id="draftStatus">待生成</span>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>生成完成后会自动进入文章页面。</span>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

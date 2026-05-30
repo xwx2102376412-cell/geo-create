@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 搜索监测 - GEO Content Studio</title>
+    <meta name="description" content="记录 GEO 文章在 AI 搜索平台中的可见性测试结果。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="./index.html" aria-label="GEO Content Studio">
+        <span class="brand-mark">G</span>
+        <span>GEO Content Studio</span>
+      </a>
+      <nav class="top-nav" aria-label="页面导航">
+        <a href="./generator.html">文章生成</a>
+        <a href="./article.html">文章页面</a>
+        <a href="./review.html">人工审核</a>
+        <a href="./monitor.html" aria-current="page">AI 搜索监测</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="monitor-page section" aria-labelledby="monitor-title">
+        <div class="section-heading">
+          <span class="eyebrow">AI Search Monitor</span>
+          <h1 id="monitor-title">AI 搜索监测清单</h1>
+          <p>记录每篇 GEO 文章在 Perplexity、Google AI Overview、Bing Copilot、ChatGPT Search 等平台中的品牌出现、链接引用和回答位置。</p>
+        </div>
+
+        <div class="monitor-stats" aria-label="监测统计">
+          <article>
+            <span>总测试</span>
+            <strong id="totalCount">0</strong>
+          </article>
+          <article>
+            <span>品牌出现</span>
+            <strong id="brandCount">0</strong>
+          </article>
+          <article>
+            <span>链接引用</span>
+            <strong id="linkCount">0</strong>
+          </article>
+          <article>
+            <span>可见率</span>
+            <strong id="visibilityRate">0%</strong>
+          </article>
+        </div>
+
+        <form class="control-panel monitor-form" id="monitorForm">
+          <div class="form-grid">
+            <label>
+              测试日期
+              <input id="testDate" type="date" />
+            </label>
+            <label>
+              AI 平台
+              <select id="aiPlatform">
+                <option>Perplexity</option>
+                <option>Google AI Overview</option>
+                <option>Bing Copilot</option>
+                <option>ChatGPT Search</option>
+                <option>DeepSeek Search</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label>
+              文章 URL
+              <input id="articleUrl" type="url" placeholder="https://example.com/blog/article/" />
+            </label>
+            <label>
+              测试问题
+              <input id="searchQuery" type="text" placeholder="How to choose EN388 cut resistant gloves?" />
+            </label>
+            <label>
+              是否出现品牌
+              <select id="brandVisible">
+                <option value="yes">是</option>
+                <option value="no" selected>否</option>
+              </select>
+            </label>
+            <label>
+              是否引用链接
+              <select id="linkVisible">
+                <option value="yes">是</option>
+                <option value="no" selected>否</option>
+              </select>
+            </label>
+            <label>
+              位置 / 排名
+              <input id="position" type="text" placeholder="例如：第 2 条引用 / 未出现" />
+            </label>
+            <label>
+              截图或备注
+              <input id="notes" type="text" placeholder="截图文件名、回答摘要或优化建议" />
+            </label>
+          </div>
+
+          <div class="action-row">
+            <button class="button primary" type="submit">添加记录</button>
+            <button class="button secondary" type="button" id="exportCsv">导出 CSV</button>
+            <button class="button secondary" type="button" id="clearRecords">清空记录</button>
+            <span class="status-pill" id="monitorStatus">待记录</span>
+          </div>
+        </form>
+
+        <section class="monitor-table-card" aria-labelledby="records-title">
+          <div class="result-toolbar">
+            <div>
+              <span class="eyebrow">Visibility Records</span>
+              <h3 id="records-title">监测记录</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="monitor-table">
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>平台</th>
+                  <th>文章 URL</th>
+                  <th>测试问题</th>
+                  <th>品牌</th>
+                  <th>链接</th>
+                  <th>位置</th>
+                  <th>备注</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="monitorRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>建议每周固定测试同一批问题，持续观察品牌和链接可见性变化。</span>
+    </footer>
+
+    <script src="./page-effects.js"></script>
+    <script src="./monitor.js"></script>
+  </body>
+</html>

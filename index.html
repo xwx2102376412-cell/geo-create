@@ -3,239 +3,59 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>公司 GEO 内容生成工具 MVP</title>
+    <title>GEO 文章生成与审核工具</title>
     <meta
       name="description"
-      content="面向材料、防护产品和外贸独立站的 GEO 文章生成工具 MVP。"
+      content="输入关键词生成 GEO 文章草稿，并通过人工审核清单确认后发布使用。"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="app-header">
-      <a class="brand" href="#generator" aria-label="GEO Content Studio">
+      <a class="brand" href="./index.html" aria-label="GEO Content Studio">
         <span class="brand-mark">G</span>
         <span>GEO Content Studio</span>
       </a>
       <nav class="top-nav" aria-label="页面导航">
-        <a href="#generator">生成工具</a>
-        <a href="#library">资料库</a>
-        <a href="#matrix">页面矩阵</a>
-        <a href="#plan">执行计划</a>
+        <a href="./generator.html">文章生成</a>
+        <a href="./article.html">文章页面</a>
+        <a href="./review.html">人工审核</a>
+        <a href="./monitor.html">AI 搜索监测</a>
       </nav>
     </header>
 
     <main>
-      <section class="hero" aria-labelledby="hero-title">
+      <section class="hero reveal" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">MVP for GEO Content Operations</p>
-          <h1 id="hero-title">公司产品 / 材料 GEO 文章生成系统</h1>
+          <p class="eyebrow">GEO Article Generator</p>
+          <h1 id="hero-title">GEO 文章生成与审核工具</h1>
           <p>
-            输入关键词，选择产品分类、文章类型、目标市场和语言，自动生成标题、大纲、正文、FAQ、Meta、URL、内链建议和 CTA 草稿，供人工审核后上传到公司独立站。
+            生成页面负责输出标准 GEO 文章草稿，审核页面负责检查标题、参数、认证、FAQ 和询盘按钮是否可发布。
           </p>
-        </div>
-        <div class="hero-panel" aria-label="项目流程">
-          <span>产品资料库</span>
-          <strong>→</strong>
-          <span>关键词库</span>
-          <strong>→</strong>
-          <span>模板生成</span>
-          <strong>→</strong>
-          <span>人工审核</span>
-          <strong>→</strong>
-          <span>独立站发布</span>
-        </div>
-      </section>
-
-      <section id="generator" class="workspace" aria-labelledby="generator-title">
-        <div class="section-heading">
-          <span class="eyebrow">Content Generator</span>
-          <h2 id="generator-title">第一版生成工具</h2>
-        </div>
-
-        <form class="control-panel" id="generatorForm">
-          <label>
-            输入关键词
-            <input
-              id="keyword"
-              type="text"
-              value="cut resistant gloves supplier in USA"
-              placeholder="例如：UHMWPE fiber supplier"
-            />
-          </label>
-
-          <div class="form-grid">
-            <label>
-              文章类型
-              <select id="articleType">
-                <option value="product">产品介绍型文章</option>
-                <option value="application">行业应用型文章</option>
-                <option value="buyer">买家问题型文章</option>
-                <option value="geo" selected>地区 GEO 页面</option>
-              </select>
-            </label>
-            <label>
-              产品分类
-              <select id="category"></select>
-            </label>
-            <label>
-              目标市场
-              <select id="market">
-                <option>USA</option>
-                <option>Europe</option>
-                <option>Middle East</option>
-                <option>Japan</option>
-                <option>China</option>
-              </select>
-            </label>
-            <label>
-              输出语言
-              <select id="language">
-                <option value="en" selected>English</option>
-                <option value="zh">中文</option>
-              </select>
-            </label>
+          <div class="hero-actions" aria-label="主要操作">
+            <a class="button primary" href="./generator.html">进入文章生成</a>
+            <a class="button ghost" href="./review.html">进入人工审核</a>
           </div>
-
-          <label>
-            公司名称
-            <input id="companyName" type="text" value="Your Company" />
-          </label>
-
-          <label>
-            额外要求
-            <textarea
-              id="notes"
-              rows="3"
-              placeholder="例如：不要写具体测试数据；强调 OEM 和样品申请；文章用于 WordPress 草稿。"
-            ></textarea>
-          </label>
-
-          <div class="action-row">
-            <button class="button primary" type="submit">生成文章草稿</button>
-            <button class="button secondary" type="button" id="copyAll">复制全部</button>
-            <button class="button secondary" type="button" id="downloadMarkdown">导出 Markdown</button>
-          </div>
-        </form>
-
-        <aside class="quality-panel" aria-labelledby="quality-title">
-          <div class="panel-head">
-            <span class="eyebrow">Review Gate</span>
-            <h3 id="quality-title">发布前审核规则</h3>
-          </div>
-          <label><input type="checkbox" /> 标题自然，没有关键词堆砌</label>
-          <label><input type="checkbox" /> 参数、认证、规格没有乱写</label>
-          <label><input type="checkbox" /> 内容解决真实采购问题</label>
-          <label><input type="checkbox" /> 包含 FAQ、内链和 CTA</label>
-          <label><input type="checkbox" /> 避免“最好”“第一”“100% 安全”等夸张词</label>
-          <label><input type="checkbox" /> 人工确认后再发布</label>
-        </aside>
-
-        <section class="result-panel" aria-live="polite">
-          <div class="result-toolbar">
-            <div>
-              <span class="eyebrow">Generated Draft</span>
-              <h3>生成结果</h3>
-            </div>
-            <span class="status-pill" id="draftStatus">待生成</span>
-          </div>
-
-          <div class="result-grid">
-            <article class="result-card wide">
-              <h4>标题建议</h4>
-              <ol id="titles"></ol>
-            </article>
-            <article class="result-card">
-              <h4>Meta Title</h4>
-              <p id="metaTitle"></p>
-            </article>
-            <article class="result-card">
-              <h4>Meta Description</h4>
-              <p id="metaDescription"></p>
-            </article>
-            <article class="result-card">
-              <h4>URL 建议</h4>
-              <p id="urlSlug"></p>
-            </article>
-            <article class="result-card">
-              <h4>内链建议</h4>
-              <ul id="internalLinks"></ul>
-            </article>
-            <article class="result-card wide">
-              <h4>文章正文</h4>
-              <div id="articleBody" class="article-output"></div>
-            </article>
-            <article class="result-card wide">
-              <h4>FAQ</h4>
-              <div id="faqOutput" class="article-output"></div>
-            </article>
-            <article class="result-card wide">
-              <h4>CTA 转化文案</h4>
-              <p id="ctaOutput"></p>
-            </article>
-          </div>
-        </section>
-      </section>
-
-      <section id="library" class="section" aria-labelledby="library-title">
-        <div class="section-heading">
-          <span class="eyebrow">Product Library</span>
-          <h2 id="library-title">内置产品资料库</h2>
-          <p>第一版先把产品大类、材料、卖点、认证、应用行业和禁用表达固化到前端，后续可以迁移到 Excel、数据库或 CMS。</p>
         </div>
-        <div class="library-grid" id="libraryGrid"></div>
-      </section>
-
-      <section id="matrix" class="section matrix" aria-labelledby="matrix-title">
-        <div class="section-heading">
-          <span class="eyebrow">Website Matrix</span>
-          <h2 id="matrix-title">独立站页面结构规划</h2>
+        <div class="hero-visual" aria-label="GEO 内容运营场景">
+          <img src="./assets/geo-hero.png" alt="团队使用 GEO 文章生成工具规划内容" />
+          <div class="hero-panel" aria-label="页面入口">
+            <span>首页</span>
+            <strong>→</strong>
+            <span>文章生成页</span>
+            <strong>→</strong>
+            <span>审核页面</span>
+            <strong>→</strong>
+            <span>发布使用</span>
+          </div>
         </div>
-        <div class="matrix-grid">
-          <article>
-            <h3>/products/</h3>
-            <p>产品页：手套、绳索、防弹材料、防割面料等核心销售页面。</p>
-          </article>
-          <article>
-            <h3>/materials/</h3>
-            <p>材料页：UHMWPE、芳纶、尼龙、涤纶等材料介绍和性能说明。</p>
-          </article>
-          <article>
-            <h3>/applications/</h3>
-            <p>应用页：金属加工、玻璃搬运、船舶系泊、军警防护、户外救援。</p>
-          </article>
-          <article>
-            <h3>/markets/</h3>
-            <p>地区 GEO 页：USA、Europe、Middle East、Japan 等区域采购页面。</p>
-          </article>
-          <article>
-            <h3>/blog/</h3>
-            <p>指南和对比文章：买家问题、标准解释、材料对比、选型建议。</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="plan" class="section plan" aria-labelledby="plan-title">
-        <div class="section-heading">
-          <span class="eyebrow">8-Week Plan</span>
-          <h2 id="plan-title">推荐执行时间表</h2>
-        </div>
-        <ol class="timeline">
-          <li><span>第 1 周</span><strong>准备产品资料库 Excel</strong></li>
-          <li><span>第 2 周</span><strong>建立关键词库和优先级</strong></li>
-          <li><span>第 3 周</span><strong>确认文章、FAQ、Meta 模板</strong></li>
-          <li><span>第 4 周</span><strong>完成生成工具 MVP</strong></li>
-          <li><span>第 5 周</span><strong>生成第一批 30 篇草稿</strong></li>
-          <li><span>第 6 周</span><strong>人工审核和内容优化</strong></li>
-          <li><span>第 7 周</span><strong>上传独立站并提交 Sitemap</strong></li>
-          <li><span>第 8 周</span><strong>查看收录、曝光、点击和询盘</strong></li>
-        </ol>
       </section>
     </main>
 
     <footer class="app-footer">
-      <span>建议路径：产品资料库 → 关键词库 → AI 草稿 → 人工审核 → 独立站发布 → 数据监测</span>
+      <span>GEO Article Generator：生成草稿 → 人工审核 → 发布使用</span>
     </footer>
 
-    <script src="./script.js"></script>
+    <script src="./page-effects.js"></script>
   </body>
 </html>

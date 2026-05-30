@@ -16,6 +16,7 @@ node_modules/
 dist/
 build/
 .cache/
+.codex-tmp/
 .parcel-cache/
 .vite/
 
@@ -30,4 +31,3 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
-

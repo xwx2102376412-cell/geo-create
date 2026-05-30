@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>人工审核 - GEO Content Studio</title>
+    <meta name="description" content="GEO 文章发布前人工审核清单。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="./index.html" aria-label="GEO Content Studio">
+        <span class="brand-mark">G</span>
+        <span>GEO Content Studio</span>
+      </a>
+      <nav class="top-nav" aria-label="页面导航">
+        <a href="./generator.html">文章生成</a>
+        <a href="./article.html">文章页面</a>
+        <a href="./review.html" aria-current="page">人工审核</a>
+        <a href="./monitor.html">AI 搜索监测</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="review-page section reveal" aria-labelledby="quality-title">
+        <div class="section-heading">
+          <span class="eyebrow">Review Gate</span>
+          <h1 id="quality-title">GEO 文章人工审核</h1>
+          <p>发布前逐项确认内容真实、自然、可转化，避免虚假参数和夸张承诺。</p>
+        </div>
+
+        <div class="quality-panel review-checklist">
+          <label><input type="checkbox" /> 标题自然，没有关键词堆砌</label>
+          <label><input type="checkbox" /> 简介能说明目标买家和 GEO 主题</label>
+          <label><input type="checkbox" /> “产品是什么”没有写错材料、结构或用途</label>
+          <label><input type="checkbox" /> 核心卖点真实，没有夸大性能</label>
+          <label><input type="checkbox" /> 应用场景符合产品实际用途</label>
+          <label><input type="checkbox" /> 选购建议能帮助采购方判断规格、样品、MOQ 和交期</label>
+          <label><input type="checkbox" /> 认证标准没有乱写，测试报告表述谨慎</label>
+          <label><input type="checkbox" /> 公司优势表述事实化，没有“最好”“第一”“100% 安全”等词</label>
+          <label><input type="checkbox" /> FAQ 回答真实采购问题</label>
+          <label><input type="checkbox" /> 询盘按钮清晰，并能引导报价、样品或定制需求</label>
+        </div>
+
+        <div class="review-actions">
+          <a class="button secondary" href="./generator.html">返回生成页面</a>
+          <button class="button primary" type="button" id="markReviewed">标记审核完成</button>
+          <span class="status-pill" id="reviewStatus">待审核</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>人工审核完成后，再发布到独立站或 CMS。</span>
+    </footer>
+
+    <script src="./page-effects.js"></script>
+    <script src="./review.js"></script>
+  </body>
+</html>

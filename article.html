@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文章页面 - GEO Content Studio</title>
+    <meta name="description" content="查看、复制和导出生成后的 GEO 文章草稿。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="./index.html" aria-label="GEO Content Studio">
+        <span class="brand-mark">G</span>
+        <span>GEO Content Studio</span>
+      </a>
+      <nav class="top-nav" aria-label="页面导航">
+        <a href="./generator.html">文章生成</a>
+        <a href="./article.html" aria-current="page">文章页面</a>
+        <a href="./review.html">人工审核</a>
+        <a href="./monitor.html">AI 搜索监测</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="article-page section" aria-labelledby="article-title">
+        <div class="section-heading">
+          <span class="eyebrow">Generated Article</span>
+          <h1 id="article-title">GEO 文章草稿</h1>
+          <p>这里展示最近一次生成的文章草稿，可复制、导出 Markdown，或进入人工审核。</p>
+        </div>
+
+        <div class="action-row article-actions">
+          <a class="button secondary" href="./generator.html">返回生成页面</a>
+          <button class="button secondary" type="button" id="copyAll">复制全部</button>
+          <button class="button secondary" type="button" id="downloadMarkdown">导出 Markdown</button>
+          <a class="button primary" href="./review.html">进入人工审核</a>
+          <span class="status-pill" id="draftStatus">读取中</span>
+        </div>
+
+        <section class="result-panel article-result" aria-live="polite">
+          <div class="result-grid">
+            <article class="result-card wide">
+              <h4>标题建议</h4>
+              <ol id="titles"></ol>
+            </article>
+            <article class="result-card">
+              <h4>Meta Title</h4>
+              <p id="metaTitle"></p>
+            </article>
+            <article class="result-card">
+              <h4>Meta Description</h4>
+              <p id="metaDescription"></p>
+            </article>
+            <article class="result-card">
+              <h4>URL 建议</h4>
+              <p id="urlSlug"></p>
+            </article>
+            <article class="result-card">
+              <h4>内链建议</h4>
+              <ul id="internalLinks"></ul>
+            </article>
+            <article class="result-card wide">
+              <h4>文章正文</h4>
+              <div id="articleBody" class="article-output"></div>
+            </article>
+            <article class="result-card wide">
+              <h4>FAQ</h4>
+              <div id="faqOutput" class="article-output"></div>
+            </article>
+            <article class="result-card wide">
+              <h4>询盘按钮</h4>
+              <a class="inquiry-button" id="ctaOutput" href="./review.html"></a>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>确认文章内容后，请进入人工审核页面。</span>
+    </footer>
+
+    <script src="./page-effects.js"></script>
+    <script src="./article.js"></script>
+  </body>
+</html>
