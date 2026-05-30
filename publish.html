@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>内容发布 - GEO Content Studio</title>
+    <meta name="description" content="输入 CMS 或独立站发布网址，并跳转到目标网址发布 GEO 文章。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="./index.html" aria-label="GEO Content Studio">
+        <span class="brand-mark">G</span>
+        <span>GEO Content Studio</span>
+      </a>
+      <nav class="top-nav" aria-label="页面导航">
+        <a href="./generator.html">文章生成</a>
+        <a href="./article.html">文章页面</a>
+        <a href="./review.html">人工审核</a>
+        <a href="./publish.html" aria-current="page">内容发布</a>
+        <a href="./monitor.html">AI 搜索监测</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="publish-page section" aria-labelledby="publish-title">
+        <div class="section-heading">
+          <span class="eyebrow">Publish</span>
+          <h1 id="publish-title">内容发布页面</h1>
+          <p>输入你的独立站、WordPress、Shopify、CMS 或文章发布后台网址，点击后跳转到目标网址完成发布。</p>
+        </div>
+
+        <form class="control-panel publish-form" id="publishForm">
+          <label>
+            发布目标网址
+            <input
+              id="publishUrl"
+              type="url"
+              placeholder="例如：https://example.com/wp-admin/post-new.php"
+              required
+            />
+          </label>
+
+          <div class="form-grid">
+            <label>
+              发布平台
+              <select id="publishPlatform">
+                <option>WordPress</option>
+                <option>Shopify</option>
+                <option>Webflow</option>
+                <option>独立站后台</option>
+                <option>其他 CMS</option>
+              </select>
+            </label>
+            <label>
+              发布状态
+              <select id="publishStatus">
+                <option>准备发布</option>
+                <option>已打开后台</option>
+                <option>已发布</option>
+                <option>待修改</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            备注
+            <textarea
+              id="publishNotes"
+              rows="3"
+              placeholder="例如：复制文章正文到 WordPress，发布后回来填写最终文章 URL。"
+            ></textarea>
+          </label>
+
+          <div class="action-row">
+            <button class="button primary" type="submit">打开发布网址</button>
+            <button class="button secondary" type="button" id="savePublishRecord">保存记录</button>
+            <span class="status-pill" id="publishMessage">待发布</span>
+          </div>
+        </form>
+
+        <section class="monitor-table-card publish-history" aria-labelledby="publish-records-title">
+          <div class="result-toolbar">
+            <div>
+              <span class="eyebrow">Publish Records</span>
+              <h3 id="publish-records-title">发布记录</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="monitor-table">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>平台</th>
+                  <th>发布网址</th>
+                  <th>状态</th>
+                  <th>备注</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="publishRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>发布完成后，可进入 AI 搜索监测页面记录品牌和链接可见性。</span>
+    </footer>
+
+    <script src="./page-effects.js"></script>
+    <script src="./publish.js"></script>
+  </body>
+</html>

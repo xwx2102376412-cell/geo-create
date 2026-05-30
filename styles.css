@@ -610,12 +610,22 @@ textarea {
   padding: 22px;
 }
 
+.article-confirm {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
 .has-empty-draft .article-result {
   border-color: rgba(220, 93, 74, 0.36);
   background: #fffaf8;
 }
 
 .monitor-page {
+  min-height: calc(100vh - 146px);
+}
+
+.publish-page {
   min-height: calc(100vh - 146px);
 }
 
@@ -653,6 +663,10 @@ textarea {
 }
 
 .monitor-form {
+  margin-bottom: 18px;
+}
+
+.publish-form {
   margin-bottom: 18px;
 }
 
