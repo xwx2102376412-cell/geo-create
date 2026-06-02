@@ -173,6 +173,49 @@ Input:
 `.trim();
 }
 
+function buildKeywordSuggestionPrompt(values) {
+  const outputLanguage =
+    values.language === "zh" ? "Chinese" : values.language === "en" ? "English" : values.language;
+  const articleType = values.articleTypeLabel || values.articleType;
+  const productCategory = values.categoryLabel || values.category;
+  const extraRequirements = values.notes?.trim() || "None";
+
+  return `
+You are a B2B SEO and GEO keyword strategist for industrial products.
+
+Suggest keywords that are suitable for creating GEO articles.
+Return valid JSON only using this exact shape:
+{
+  "keywords": [
+    {
+      "keyword": "target keyword",
+      "intent": "buyer intent, comparison intent, supplier intent, application intent, or compliance intent",
+      "articleType": "recommended article angle",
+      "reason": "why this keyword is suitable"
+    }
+  ]
+}
+
+Rules:
+- Return 12-18 keyword suggestions.
+- Start from the seed keyword, then expand into long-tail B2B buyer keywords, supplier keywords, application keywords, certification keywords, problem keywords, and market-specific GEO keywords.
+- Prioritize keywords that are likely to be useful for Google search, Bing search, ChatGPT-style AI answers, Perplexity-style answers, and B2B procurement research.
+- Do not claim exact weekly search volume, Google rank, ChatGPT usage volume, or real-time trend data unless the user connects an external keyword data source.
+- Keep each keyword specific enough to write a full article.
+- Match the selected article type, product category, target market, output language, company name, and extra requirements.
+- If the output language is ${outputLanguage}, write keyword recommendations in the most practical search language for that target market.
+
+Input:
+- Seed keyword: ${values.keyword}
+- Article type: ${articleType} (${values.articleType})
+- Product category: ${productCategory} (${values.category})
+- Target market: ${values.market}
+- Output language: ${outputLanguage} (${values.language})
+- Company name: ${values.company}
+- Extra requirements: ${extraRequirements}
+`.trim();
+}
+
 function extractJson(content) {
   const trimmed = content.trim();
   if (trimmed.startsWith("{")) {
@@ -347,6 +390,52 @@ async function suggestPublishTargets(values) {
   return Array.isArray(parsed.targets) ? parsed.targets : [];
 }
 
+async function suggestKeywords(values) {
+  const config = getDeepSeekConfig(values);
+
+  const apiResponse = await fetch(`${config.deepseekBaseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${config.apiKey}`,
+    },
+    body: JSON.stringify({
+      model: config.deepseekModel,
+      messages: [
+        {
+          role: "system",
+          content: "You suggest B2B GEO keywords as valid JSON only.",
+        },
+        {
+          role: "user",
+          content: buildKeywordSuggestionPrompt(values),
+        },
+      ],
+      temperature: 0.45,
+      max_tokens: 3000,
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  const responseText = await apiResponse.text();
+  if (!apiResponse.ok) {
+    const error = new Error(`DeepSeek API error: ${apiResponse.status} ${responseText}`);
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const data = JSON.parse(responseText);
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    const error = new Error("DeepSeek API returned an empty response.");
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const parsed = await parseAiJson(content, config);
+  return Array.isArray(parsed.keywords) ? parsed.keywords : [];
+}
+
 loadLocalEnv();
 
 http
@@ -372,6 +461,19 @@ http
       } catch (error) {
         sendJson(response, error.statusCode || 500, {
           error: error.message || "Failed to suggest publish targets.",
+        });
+      }
+      return;
+    }
+
+    if (request.method === "POST" && request.url === "/api/suggest-keywords") {
+      try {
+        const values = await readJsonBody(request);
+        const keywords = await suggestKeywords(values);
+        sendJson(response, 200, { keywords });
+      } catch (error) {
+        sendJson(response, error.statusCode || 500, {
+          error: error.message || "Failed to suggest keywords.",
         });
       }
       return;

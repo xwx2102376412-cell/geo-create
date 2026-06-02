@@ -96,6 +96,10 @@ const categorySelect = document.querySelector("#category");
 const form = document.querySelector("#generatorForm");
 const draftStatus = document.querySelector("#draftStatus");
 const appHeader = document.querySelector(".app-header");
+const suggestKeywordsButton = document.querySelector("#suggestKeywords");
+const keywordResults = document.querySelector("#keywordResults");
+const keywordInput = document.querySelector("#keyword");
+const keywordSeedInput = document.querySelector("#keywordSeed");
 
 function setupPageEffects() {
   const updateHeader = () => {
@@ -143,6 +147,14 @@ function slugify(value) {
 
 function sentenceList(items) {
   return items.join(", ");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function getArticleSubject(keyword, product, market) {
@@ -434,6 +446,56 @@ async function requestAiDraft(values) {
   return payload.draft;
 }
 
+async function requestKeywordSuggestions(values) {
+  const response = await fetch("/api/suggest-keywords", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(values),
+  });
+
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(payload.error || "关键词搜索失败");
+  }
+
+  return payload.keywords;
+}
+
+function readKeywordSuggestionForm() {
+  return {
+    ...readForm(),
+    keyword: keywordSeedInput.value.trim() || keywordInput.value.trim() || "UHMWPE fiber",
+  };
+}
+
+function renderKeywordSuggestions(items) {
+  if (!items.length) {
+    keywordResults.innerHTML = "<p>暂无关键词建议。</p>";
+    return;
+  }
+
+  keywordResults.innerHTML = items
+    .map(
+      (item, index) => {
+        const keyword = escapeHtml(item.keyword);
+        return `
+        <article class="keyword-card">
+          <div>
+            <span class="keyword-rank">${index + 1}</span>
+            <strong>${keyword}</strong>
+            <p>${escapeHtml(item.reason)}</p>
+            <small>${escapeHtml(item.intent)} · ${escapeHtml(item.articleType)}</small>
+          </div>
+          <button class="button secondary use-keyword" type="button" data-keyword="${keyword}">使用</button>
+        </article>
+      `;
+      },
+    )
+    .join("");
+}
+
 function toMarkdown(draft) {
   const blockToMarkdown = (block) => {
     if (block.type === "subheading") {
@@ -523,6 +585,40 @@ form.addEventListener("submit", (event) => {
 
 form.addEventListener("input", () => {
   draftStatus.textContent = "已修改，点击生成";
+});
+
+suggestKeywordsButton.addEventListener("click", () => {
+  const originalText = suggestKeywordsButton.textContent;
+  suggestKeywordsButton.disabled = true;
+  suggestKeywordsButton.textContent = "搜索中...";
+  keywordResults.innerHTML = "<p>正在生成关键词建议...</p>";
+
+  requestKeywordSuggestions(readKeywordSuggestionForm())
+    .then((items) => {
+      renderKeywordSuggestions(items);
+      draftStatus.textContent = "关键词建议已生成";
+    })
+    .catch((error) => {
+      keywordResults.innerHTML = "";
+      const message = document.createElement("p");
+      message.textContent = error.message;
+      keywordResults.append(message);
+    })
+    .finally(() => {
+      suggestKeywordsButton.disabled = false;
+      suggestKeywordsButton.textContent = originalText;
+    });
+});
+
+keywordResults.addEventListener("click", (event) => {
+  const button = event.target.closest(".use-keyword");
+  if (!button) {
+    return;
+  }
+
+  keywordInput.value = button.dataset.keyword;
+  keywordSeedInput.value = button.dataset.keyword;
+  draftStatus.textContent = "已选择关键词，点击生成";
 });
 
 populateCategories();

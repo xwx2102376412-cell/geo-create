@@ -417,6 +417,62 @@ textarea {
   grid-column: 1;
 }
 
+.generator-page > .keyword-panel {
+  grid-column: 1;
+}
+
+.keyword-results {
+  display: grid;
+  gap: 10px;
+}
+
+.keyword-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.keyword-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfc;
+}
+
+.keyword-card strong {
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--teal-dark);
+  font-size: 16px;
+}
+
+.keyword-card p {
+  margin: 8px 0 4px;
+}
+
+.keyword-card small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.keyword-rank {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: white;
+  border-radius: 8px;
+  background: var(--graphite);
+  font-size: 13px;
+  font-weight: 900;
+}
+
 .result-panel.is-updated {
   border-color: rgba(15, 118, 110, 0.55);
   box-shadow: 0 18px 54px rgba(15, 118, 110, 0.16);
@@ -832,7 +888,9 @@ textarea {
   .hero-panel,
   .form-grid,
   .result-grid,
-  .monitor-stats {
+  .monitor-stats,
+  .keyword-search,
+  .keyword-card {
     grid-template-columns: 1fr;
   }
 
