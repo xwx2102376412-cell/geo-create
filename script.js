@@ -480,14 +480,19 @@ function toMarkdown(draft) {
 }
 
 function readForm() {
+  const articleTypeSelect = document.querySelector("#articleType");
+  const categorySelectElement = document.querySelector("#category");
+
   return {
     keyword: document.querySelector("#keyword").value.trim() || "UHMWPE fiber",
-    articleType: document.querySelector("#articleType").value,
-    category: document.querySelector("#category").value,
+    articleType: articleTypeSelect.value,
+    articleTypeLabel: articleTypeSelect.options[articleTypeSelect.selectedIndex].text,
+    category: categorySelectElement.value,
+    categoryLabel: categorySelectElement.options[categorySelectElement.selectedIndex].text,
     market: document.querySelector("#market").value,
     language: document.querySelector("#language").value,
     model: document.querySelector("#deepseekModel").value,
-    company: document.querySelector("#companyName").value.trim() || "Your Company",
+    company: document.querySelector("#companyName").value.trim() || "DingQing",
     notes: document.querySelector("#notes").value,
   };
 }

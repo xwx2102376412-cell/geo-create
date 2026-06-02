@@ -70,10 +70,20 @@ function sendJson(response, statusCode, payload) {
 }
 
 function buildPrompt(values) {
+  const outputLanguage =
+    values.language === "zh" ? "Chinese" : values.language === "en" ? "English" : values.language;
+  const articleType = values.articleTypeLabel || values.articleType;
+  const productCategory = values.categoryLabel || values.category;
+  const extraRequirements = values.notes?.trim() || "None";
+  const extraRequirementRule =
+    extraRequirements === "None"
+      ? "- No extra user requirements were provided."
+      : `- Extra user requirements are mandatory and MUST be followed: "${extraRequirements}". If any extra requirement conflicts with factual accuracy, certifications, legal compliance, or safety, keep the content factual and use conservative wording.`;
+
   return `
 You are a senior B2B SEO and GEO content strategist for industrial products.
 
-Generate a long-form English buyer guide article using this exact JSON shape:
+Generate a long-form ${outputLanguage} buyer guide article using this exact JSON shape:
 {
   "titles": ["primary title", "alternate title 1", "alternate title 2", "alternate title 3"],
   "metaTitle": "SEO meta title",
@@ -97,6 +107,14 @@ Generate a long-form English buyer guide article using this exact JSON shape:
 
 Rules:
 - Return valid JSON only. No markdown fences.
+- You MUST write the article based on all user inputs below: keyword, article type, product category, target market, output language, and company name.
+- The primary title, meta title, meta description, URL, section headings, tables, FAQ, and CTA MUST all reflect the keyword: "${values.keyword}".
+- The article structure and angle MUST match the selected article type: "${articleType}".
+- The product facts, materials, specifications, applications, and buyer advice MUST focus on the selected product category: "${productCategory}".
+- The buyer context, compliance concerns, wording, and examples MUST be adapted to the target market: "${values.market}".
+- The entire article content MUST be written in ${outputLanguage}. Do not mix languages except for standard technical terms, certifications, or product names.
+- The company advantage section and CTA MUST mention the company name "${values.company}" naturally.
+${extraRequirementRule}
 - Follow this article style: practical industrial buyer guide, similar to "How to Choose EN388 Certified Cut Resistant Gloves for Industrial Use".
 - Include opening buyer-focused paragraphs.
 - Include numbered sections.
@@ -110,13 +128,13 @@ Rules:
 
 Input:
 - Keyword: ${values.keyword}
-- Article type: ${values.articleType}
-- Product category: ${values.category}
+- Article type: ${articleType} (${values.articleType})
+- Product category: ${productCategory} (${values.category})
 - Target market: ${values.market}
-- Output language preference: ${values.language}
+- Output language: ${outputLanguage} (${values.language})
 - DeepSeek model: ${values.model || "default"}
 - Company name: ${values.company}
-- Extra requirements: ${values.notes || "None"}
+- Extra requirements: ${extraRequirements}
 `.trim();
 }
 
