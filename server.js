@@ -107,6 +107,9 @@ Generate a long-form ${outputLanguage} buyer guide article using this exact JSON
 
 Rules:
 - Return valid JSON only. No markdown fences.
+- Every table must use this format exactly: {"type":"table","headers":["A","B"],"rows":[["cell 1","cell 2"],["cell 1","cell 2"]]}.
+- Every table row MUST be an array of strings. Separate every row and every cell with commas. Do not use markdown table syntax.
+- Escape all double quotes inside text strings or replace them with single quotes.
 - You MUST write the article based on all user inputs below: keyword, article type, product category, target market, output language, and company name.
 - The primary title, meta title, meta description, URL, section headings, tables, FAQ, and CTA MUST all reflect the keyword: "${values.keyword}".
 - The article structure and angle MUST match the selected article type: "${articleType}".
@@ -184,6 +187,58 @@ function extractJson(content) {
   return JSON.parse(match[0]);
 }
 
+async function repairJsonContent(content, config) {
+  const apiResponse = await fetch(`${config.deepseekBaseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${config.apiKey}`,
+    },
+    body: JSON.stringify({
+      model: config.deepseekModel,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You repair malformed JSON. Return valid JSON only. Do not add markdown fences or explanations.",
+        },
+        {
+          role: "user",
+          content: `Repair this malformed JSON into valid JSON. Preserve the same data shape and content as much as possible:\n\n${content}`,
+        },
+      ],
+      temperature: 0,
+      max_tokens: 8000,
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  const responseText = await apiResponse.text();
+  if (!apiResponse.ok) {
+    const error = new Error(`DeepSeek JSON repair error: ${apiResponse.status} ${responseText}`);
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const data = JSON.parse(responseText);
+  const repairedContent = data.choices?.[0]?.message?.content;
+  if (!repairedContent) {
+    const error = new Error("DeepSeek JSON repair returned an empty response.");
+    error.statusCode = 502;
+    throw error;
+  }
+
+  return extractJson(repairedContent);
+}
+
+function parseAiJson(content, config) {
+  try {
+    return Promise.resolve(extractJson(content));
+  } catch {
+    return repairJsonContent(content, config);
+  }
+}
+
 function getDeepSeekConfig(values = {}) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
@@ -201,28 +256,29 @@ function getDeepSeekConfig(values = {}) {
 }
 
 async function generateArticle(values) {
-  const { apiKey, deepseekBaseUrl, deepseekModel } = getDeepSeekConfig(values);
+  const config = getDeepSeekConfig(values);
 
-  const apiResponse = await fetch(`${deepseekBaseUrl}/chat/completions`, {
+  const apiResponse = await fetch(`${config.deepseekBaseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${config.apiKey}`,
     },
     body: JSON.stringify({
-      model: deepseekModel,
+      model: config.deepseekModel,
       messages: [
         {
           role: "system",
-          content: "You generate structured B2B GEO article drafts as valid JSON only.",
+          content:
+            "You generate structured B2B GEO article drafts as valid JSON only. Never output malformed arrays or markdown tables.",
         },
         {
           role: "user",
           content: buildPrompt(values),
         },
       ],
-      temperature: 0.7,
-      max_tokens: 5000,
+      temperature: 0.55,
+      max_tokens: 8000,
       response_format: { type: "json_object" },
     }),
   });
@@ -242,7 +298,7 @@ async function generateArticle(values) {
     throw error;
   }
 
-  return extractJson(content);
+  return parseAiJson(content, config);
 }
 
 async function suggestPublishTargets(values) {
