@@ -153,9 +153,7 @@ Return valid JSON only using this exact shape:
       "platform": "Platform or website name",
       "url": "https://example.com/publish-or-new-post-url/",
       "reason": "Why this is suitable for this keyword",
-      "method": "How the user can publish an article here",
-      "googleIndexCondition": "What must be true for the published article to be indexable by Google",
-      "aiCitationFit": "Why the published public article may be useful for AI search answers"
+      "method": "How the user can publish an article here"
     }
   ]
 }
@@ -172,11 +170,7 @@ Rules:
 - Do not invent credentials or claim guaranteed publication.
 - Do not claim guaranteed Google indexing, Google ranking, AI citation, or ChatGPT inclusion. Explain conditions instead.
 - Avoid phrases such as "indexed quickly", "usually indexed within days", "Google-owned means higher trust", "AI models often cite", "frequently used in AI training data", or "AI may prioritize". Use conservative wording.
-- Each target must explain:
-  1. how to publish,
-  2. why the final article can be public,
-  3. what is needed for Google indexing,
-  4. why AI search may cite it after indexing.
+- Each target must explain how to publish and why it is suitable for public long-form content.
 - Keep reasons concise.
 
 Input:
@@ -222,7 +216,7 @@ function sanitizePublishTargets(targets) {
     })
     .map((target) => {
       const cleaned = { ...target };
-      ["reason", "method", "googleIndexCondition", "aiCitationFit"].forEach((key) => {
+      ["reason", "method"].forEach((key) => {
         let value = String(cleaned[key] || "");
         riskyClaims.forEach(([pattern, replacement]) => {
           value = value.replace(pattern, replacement);
@@ -230,10 +224,10 @@ function sanitizePublishTargets(targets) {
         cleaned[key] = value.trim();
       });
 
-      cleaned.googleIndexCondition =
-        "最终文章必须公开可访问、非登录可见、无 noindex、未被 robots.txt 屏蔽，并通过 sitemap、内链或网址检查提交给 Google。";
-      cleaned.aiCitationFit =
-        "文章被 Google/Bing 收录后，如果包含清晰标题、FAQ、产品事实、公司信息和外部可访问链接，才更有机会被 AI 搜索作为来源参考。";
+      delete cleaned.googleIndexCondition;
+      delete cleaned.aiCitationFit;
+      delete cleaned.indexing;
+      delete cleaned.aiSearchValue;
       return cleaned;
     })
     .slice(0, 12);

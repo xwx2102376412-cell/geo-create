@@ -752,7 +752,7 @@ textarea {
 
 .monitor-table {
   width: 100%;
-  min-width: 1180px;
+  min-width: 980px;
   border-collapse: collapse;
   font-size: 14px;
 }

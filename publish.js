@@ -96,7 +96,7 @@ function renderSuggestions(targets) {
   if (!targets.length) {
     suggestionRows.innerHTML = `
       <tr>
-        <td colspan="7">没有返回推荐网址，请换一个更具体的关键词再试。</td>
+        <td colspan="5">没有返回推荐网址，请换一个更具体的关键词再试。</td>
       </tr>
     `;
     return;
@@ -110,8 +110,6 @@ function renderSuggestions(targets) {
           <td><a href="${escapeHtml(target.url)}" target="_blank" rel="noreferrer">${escapeHtml(target.url)}</a></td>
           <td>${escapeHtml(target.reason || "适合发布相关 GEO 内容")}</td>
           <td>${escapeHtml(target.method || "手动发布")}</td>
-          <td>${escapeHtml(target.googleIndexCondition || target.indexing || "公开发布后提交到 Google Search Console 或等待抓取")}</td>
-          <td>${escapeHtml(target.aiCitationFit || target.aiSearchValue || "公开、结构化、可被搜索引擎发现后更利于 AI 搜索引用")}</td>
           <td>
             <button class="table-action" type="button" data-use-url="${escapeHtml(target.url)}" data-platform="${escapeHtml(target.platform || "其他 CMS")}">
               使用
