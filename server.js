@@ -143,27 +143,40 @@ Input:
 
 function buildPublishTargetPrompt(values) {
   return `
-You are a B2B GEO distribution strategist.
+You are a B2B GEO distribution strategist and technical SEO reviewer.
 
-Suggest suitable publishing destinations for an industrial GEO article.
+Suggest article publishing destinations for an industrial GEO article.
 Return valid JSON only using this exact shape:
 {
   "targets": [
     {
       "platform": "Platform or website name",
-      "url": "https://example.com/path/",
+      "url": "https://example.com/publish-or-new-post-url/",
       "reason": "Why this is suitable for this keyword",
-      "method": "CMS login, guest post submission, company blog, industry directory, or marketplace profile"
+      "method": "How the user can publish an article here",
+      "googleIndexCondition": "What must be true for the published article to be indexable by Google",
+      "aiCitationFit": "Why the published public article may be useful for AI search answers"
     }
   ]
 }
 
 Rules:
 - Return 8-12 targets.
-- Prefer practical destinations a B2B industrial company might actually use:
-  company blog/CMS, WordPress admin pattern, Shopify blog admin, Webflow CMS, LinkedIn article, Medium, industry directory, trade marketplace profile, distributor portal, or relevant guest-post opportunity type.
-- If you are not certain about a real submission URL, recommend the safest public homepage or submission/contact page pattern and explain that it needs manual verification.
+- Only recommend destinations where the user can realistically publish a public article, post, blog entry, company update, or long-form content.
+- Prioritize destinations whose published pages are normally public, crawlable by Google/Bing, and likely to be discoverable by AI search systems after indexing.
+- Good examples include Blogger, Medium, WordPress.com, LinkedIn Articles, Substack, Dev.to, Hashnode, public company blog/CMS, Shopify blog admin, Webflow CMS, and public industry guest-post submission pages.
+- For user-owned CMS targets, give a practical publishing entry URL pattern such as a post creation/admin URL and explain that the final published URL must be public.
+- Do NOT recommend private dashboards, search result pages, generic homepages with no publishing route, ad-only pages, private communities, login-only content, or pages blocked from indexing.
+- Do NOT recommend Pinterest, SlideShare, Reddit, Quora, Google Business Profile posts, social media status updates, short-form posts, profile pages, or product-only marketplace listings unless they support a public long-form article page.
+- Do NOT invent guaranteed submission endpoints. If the exact publish URL may vary by account, use the safest known publishing entry pattern and clearly say manual login/verification is required in the method.
 - Do not invent credentials or claim guaranteed publication.
+- Do not claim guaranteed Google indexing, Google ranking, AI citation, or ChatGPT inclusion. Explain conditions instead.
+- Avoid phrases such as "indexed quickly", "usually indexed within days", "Google-owned means higher trust", "AI models often cite", "frequently used in AI training data", or "AI may prioritize". Use conservative wording.
+- Each target must explain:
+  1. how to publish,
+  2. why the final article can be public,
+  3. what is needed for Google indexing,
+  4. why AI search may cite it after indexing.
 - Keep reasons concise.
 
 Input:
@@ -171,6 +184,59 @@ Input:
 - Current target URL, if any: ${values.currentUrl || "None"}
 - Platform preference: ${values.platform || "Any"}
 `.trim();
+}
+
+function sanitizePublishTargets(targets) {
+  const excludedPattern = /\b(pinterest|slideshare|reddit|quora|google business|google my business|facebook|instagram|tiktok|x\.com|twitter)\b/i;
+  const articlePattern = /\b(blogger|medium|wordpress|linkedin article|linkedin articles|substack|dev\.to|hashnode|webflow|shopify|company blog|cms|guest post|industry publication|editorial|blog)\b/i;
+  const riskyClaims = [
+    [/reliable indexing/gi, "public long-form article publishing"],
+    [/easy to set up and index/gi, "easy to set up for public long-form article publishing"],
+    [/indexed quickly/gi, "can be indexed when the published page is public and crawlable"],
+    [/usually indexed within days/gi, "can be indexed after Google discovers and crawls the public page"],
+    [/generally indexed/gi, "indexable when Google can crawl the public page"],
+    [/indexed by default/gi, "indexable when public and crawlable"],
+    [/is indexed/gi, "can be indexed when public and crawlable"],
+    [/are indexed/gi, "can be indexed when public and crawlable"],
+    [/public posts are indexed/gi, "public posts can be indexed when crawlable"],
+    [/Google-owned platform;?\s*/gi, ""],
+    [/high trust and fast indexing/gi, "public posts can be discovered when the blog is crawlable"],
+    [/AI models often cite/gi, "AI search tools may reference"],
+    [/frequently used in AI training data/gi, "public pages may be discoverable through search"],
+    [/frequently used in AI training and search results/gi, "public pages may appear in search results and provide source material for AI search"],
+    [/frequently referenced in AI search results/gi, "may be referenced by AI search after indexing"],
+    [/widely crawled and cited by AI/gi, "crawlable after indexing and may be referenced by AI search"],
+    [/often crawled by AI/gi, "crawlable after indexing"],
+    [/often cited by AI/gi, "may be referenced by AI search after indexing"],
+    [/can be cited by AI/gi, "may be referenced by AI search after indexing"],
+    [/are crawled and may appear in AI answers/gi, "can be crawled and may be referenced by AI search after indexing"],
+    [/easily discoverable by Google and AI systems/gi, "discoverable when public, crawlable, and indexed"],
+    [/are indexed and may be used by AI/gi, "can be indexed and may be referenced by AI search"],
+    [/AI may prioritize/gi, "AI search tools may reference"],
+  ];
+
+  return targets
+    .filter((target) => {
+      const haystack = `${target.platform || ""} ${target.url || ""} ${target.method || ""}`;
+      return !excludedPattern.test(haystack) && articlePattern.test(haystack);
+    })
+    .map((target) => {
+      const cleaned = { ...target };
+      ["reason", "method", "googleIndexCondition", "aiCitationFit"].forEach((key) => {
+        let value = String(cleaned[key] || "");
+        riskyClaims.forEach(([pattern, replacement]) => {
+          value = value.replace(pattern, replacement);
+        });
+        cleaned[key] = value.trim();
+      });
+
+      cleaned.googleIndexCondition =
+        "最终文章必须公开可访问、非登录可见、无 noindex、未被 robots.txt 屏蔽，并通过 sitemap、内链或网址检查提交给 Google。";
+      cleaned.aiCitationFit =
+        "文章被 Google/Bing 收录后，如果包含清晰标题、FAQ、产品事实、公司信息和外部可访问链接，才更有机会被 AI 搜索作为来源参考。";
+      return cleaned;
+    })
+    .slice(0, 12);
 }
 
 function buildKeywordSuggestionPrompt(values) {
@@ -387,7 +453,7 @@ async function suggestPublishTargets(values) {
   }
 
   const parsed = extractJson(content);
-  return Array.isArray(parsed.targets) ? parsed.targets : [];
+  return Array.isArray(parsed.targets) ? sanitizePublishTargets(parsed.targets) : [];
 }
 
 async function suggestKeywords(values) {

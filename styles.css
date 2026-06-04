@@ -735,6 +735,12 @@ textarea {
   background: #f3faf8;
 }
 
+.field-note {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .suggestion-panel {
   display: grid;
   gap: 12px;
@@ -746,7 +752,7 @@ textarea {
 
 .monitor-table {
   width: 100%;
-  min-width: 980px;
+  min-width: 1180px;
   border-collapse: collapse;
   font-size: 14px;
 }
